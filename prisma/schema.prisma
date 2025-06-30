@@ -1,0 +1,116 @@
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+}
+
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "wasm"
+}
+
+model Product {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  price           Float
+  cost            Float?
+  salePrice       Float?
+  isOnSale        Boolean  @default(false)
+  stock_quantity  Int
+  images          String[]
+  sku             String?  @unique
+  brand           String?
+  categoryId      String
+  category        ProductCategory @relation(fields: [categoryId], references: [id])
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ProductCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  image       String
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Service {
+  id              String   @id @default(cuid())
+  name            String
+  description     String
+  images          String[]
+  price_display   String
+  categoryId      String
+  category        ServiceCategory @relation(fields: [categoryId], references: [id])
+  metaTitle       String?
+  metaDescription String?
+  metaKeywords    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ServiceCategory {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  image       String
+  description String?
+  services    Service[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Order {
+  id             String   @id @default(cuid())
+  customer_name  String
+  customer_phone String
+  total          Float
+  status         String   @default("Pendiente")
+  items          Json
+  coupon_code    String?
+  date           DateTime @default(now())
+}
+
+model Banner {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  cta             String
+  cta_link        String
+  image           String
+  isActive        Boolean  @default(true)
+  position        String   @default("hero") 
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model PromotionalSpot {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  type            String   
+  value           String
+  isActive        Boolean  @default(true)
+  startDate       DateTime
+  endDate         DateTime
+  image           String?
+  details         String?
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Coupon {
+  code     String  @id
+  type     String // "percentage" or "fixed"
+  discount Float
+}
